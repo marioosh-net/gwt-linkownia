@@ -46,7 +46,7 @@
   
   <!-- Default page to serve -->
   <welcome-file-list>
-    <welcome-file>Start.html</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
 
 </web-app>
