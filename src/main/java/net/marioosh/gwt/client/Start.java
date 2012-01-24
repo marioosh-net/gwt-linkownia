@@ -52,6 +52,7 @@ public class Start implements EntryPoint {
 		final TextBox nameField = new TextBox();
 		nameField.setText("GWT User");
 		final Label errorLabel = new Label();
+		RootPanel.get("errorLabelContainer").add(errorLabel);
 
 		// We can add style names to widgets
 		sendButton.addStyleName("sendButton");
