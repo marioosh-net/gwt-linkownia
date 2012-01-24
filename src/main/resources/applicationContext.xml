@@ -6,6 +6,7 @@
     xmlns:mvc="http://www.springframework.org/schema/mvc" 
     xmlns:security="http://www.springframework.org/schema/security" 
     xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:p="http://www.springframework.org/schema/p"
     xsi:schemaLocation="
      http://www.springframework.org/schema/beans 
      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -22,7 +23,15 @@
 
     <context:component-scan base-package="net.marioosh.gwt" />
     <context:annotation-config />
-    <!-- <mvc:annotation-driven /> -->    
+    <mvc:annotation-driven />    
+
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:order="1">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/WEB-INF/pages/" />
+        <property name="suffix" value=".jsp" />
+        <!-- dostep do springowych beanow bezposrednio z view np. ${mainController} --> 
+        <property name="exposeContextBeansAsAttributes" value="true"/>
+    </bean>
 
     <!-- DATA SOURCE -->    
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
