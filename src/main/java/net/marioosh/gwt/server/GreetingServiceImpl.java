@@ -14,7 +14,6 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 /**
  * The server side implementation of the RPC service.
  */
-@Service("greetingService")
 @SuppressWarnings("serial")
 public class GreetingServiceImpl extends AutoinjectingRemoteServiceServlet implements
 		GreetingService {

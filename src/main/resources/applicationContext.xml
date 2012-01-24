@@ -21,7 +21,7 @@
      http://www.springframework.org/schema/context
      http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-    <context:component-scan base-package="net.marioosh.gwt" />
+    <context:component-scan base-package="net.marioosh.gwt,net.marioosh.spring" />
     <context:annotation-config />
     <mvc:annotation-driven />    
 
@@ -29,7 +29,6 @@
         <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
         <property name="prefix" value="/WEB-INF/pages/" />
         <property name="suffix" value=".jsp" />
-        <!-- dostep do springowych beanow bezposrednio z view np. ${mainController} --> 
         <property name="exposeContextBeansAsAttributes" value="true"/>
     </bean>
 

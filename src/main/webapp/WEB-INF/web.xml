@@ -11,7 +11,7 @@
     </context-param>
 
 	<servlet>
-		<servlet-name>springonly-starter</servlet-name>
+		<servlet-name>spring</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
@@ -21,8 +21,7 @@
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>springonly-starter</servlet-name>
-		<!-- <url-padttern>*.html</url-pattern> -->
+		<servlet-name>spring</servlet-name>
 		<url-pattern>/spring/*</url-pattern>
 	</servlet-mapping>
     
@@ -33,14 +32,15 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     
-  <!-- Servlets -->
+  <!-- GWT-RPC Services -->
   <servlet>
     <servlet-name>greetServlet</servlet-name>
     <servlet-class>net.marioosh.gwt.server.GreetingServiceImpl</servlet-class>
   </servlet>
-  
   <servlet-mapping>
     <servlet-name>greetServlet</servlet-name>
+    <!-- according to path in @RemoteServiceRelativePath() -->
+    <!-- @RemoteServiceRelativePath("greetingService") => /{moduleName}/greetingService -->
     <url-pattern>/start/greetingService</url-pattern>
   </servlet-mapping>
   
