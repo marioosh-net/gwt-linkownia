@@ -80,12 +80,13 @@ public class Start implements EntryPoint {
 		desc.setWidth("100%");		
 		desc.add(new Label("description"));
 		desc.add(description);
+		description.setWidth("100%");
 		
 		HorizontalPanel h = new HorizontalPanel();
 		h.add(address);
 		h.add(name);
 		VerticalPanel p = new VerticalPanel();
-		p.add(errorLabel);		
+		RootPanel.get().add(errorLabel);		
 		p.add(h);
 		p.add(desc);
 		p.add(sendButton);
