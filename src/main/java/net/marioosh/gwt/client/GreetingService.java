@@ -2,7 +2,9 @@ package net.marioosh.gwt.client;
 
 import java.util.List;
 import net.marioosh.gwt.shared.RPCException;
+import net.marioosh.gwt.shared.model.entities.Link;
 import net.marioosh.gwt.shared.model.entities.User;
+import net.marioosh.gwt.shared.model.helper.Criteria;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -19,4 +21,7 @@ public interface GreetingService extends RemoteService {
   void deleteAllUsers() throws RPCException;
   public List<User> allUsers();
   public User randomUser();
+
+  public void addLink(Link link) throws RPCException;
+  public List<Link> allLinks(Criteria c);
 }

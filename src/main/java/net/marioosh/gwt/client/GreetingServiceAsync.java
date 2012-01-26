@@ -64,6 +64,20 @@ public interface GreetingServiceAsync
 
 
     /**
+     * GWT-RPC service  asynchronous (client-side) interface
+     * @see net.marioosh.gwt.client.GreetingService
+     */
+    void addLink( net.marioosh.gwt.shared.model.entities.Link p0, AsyncCallback<Void> callback );
+
+
+    /**
+     * GWT-RPC service  asynchronous (client-side) interface
+     * @see net.marioosh.gwt.client.GreetingService
+     */
+    void allLinks( net.marioosh.gwt.shared.model.helper.Criteria p0, AsyncCallback<java.util.List> callback );
+
+
+    /**
      * Utility class to get the RPC Async interface from client-side code
      */
     public static final class Util 

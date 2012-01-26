@@ -2,6 +2,12 @@
 <module rename-to='start'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User'/>
+  
+  <!-- hibernate validator -->
+  <inherits name="org.hibernate.validator.HibernateValidator" />
+  <replace-with class="net.marioosh.gwt.client.MyValidatorFactory">
+    <when-type-is class="javax.validation.ValidatorFactory" />
+  </replace-with>
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->

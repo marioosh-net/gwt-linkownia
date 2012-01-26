@@ -1,8 +1,13 @@
 package net.marioosh.gwt.client;
 
 import java.util.List;
-import net.marioosh.gwt.shared.FieldVerifier;
-import net.marioosh.gwt.shared.model.entities.User;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import net.marioosh.gwt.shared.model.entities.Link;
+import net.marioosh.gwt.shared.model.helper.Criteria;
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -11,19 +16,22 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.validation.client.Validation;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 /**
@@ -43,80 +51,57 @@ public class Start implements EntryPoint {
 	 */
 	private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
 
+	public class Input extends Composite {
+		private TextBox textBox;
+		public Input(String label) {
+			VerticalPanel  p = new VerticalPanel();
+			p.add(new Label(label));
+			textBox = new TextBox();
+			p.add(textBox);
+			initWidget(p);
+		}
+	}
+	
 	/**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		final Button sendButton = new Button("Send");
-		final Button deleteButton = new Button("Remove all");
-		final TextBox nameField = new TextBox();
-		nameField.setText("GWT User");
+		final ValidatorFactory factory = Validation.byDefaultProvider().configure().buildValidatorFactory();
+		final Validator validator = factory.getValidator();
+		
+		final Button sendButton = new Button("Add link");
+		final Input address = new Input("address");
+		final Input name = new Input("name");
+		final TextArea description = new TextArea();
 		final Label errorLabel = new Label();
-		RootPanel.get("errorLabelContainer").add(errorLabel);
+		errorLabel.setStyleName("serverResponseLabelError");
 
-		// We can add style names to widgets
-		sendButton.addStyleName("sendButton");
-
-		// input + buttons
-		HorizontalPanel hPanel = new HorizontalPanel();
-		hPanel.setSpacing(5);
-		hPanel.add(nameField);
-		hPanel.add(sendButton);
-		hPanel.add(deleteButton);
+		VerticalPanel desc = new VerticalPanel();
+		desc.setWidth("100%");		
+		desc.add(new Label("description"));
+		desc.add(description);
+		
+		HorizontalPanel h = new HorizontalPanel();
+		h.add(address);
+		h.add(name);
+		VerticalPanel p = new VerticalPanel();
+		p.add(errorLabel);		
+		p.add(h);
+		p.add(desc);
+		p.add(sendButton);
+		RootPanel.get().add(p);
 
 		// Focus the cursor on the name field when the app loads
-		nameField.setFocus(true);
-		nameField.selectAll();
-
-		// Create the popup dialog box
-		final DialogBox dialogBox = new DialogBox();
-		dialogBox.setText("Remote Procedure Call");
-		dialogBox.setAnimationEnabled(true);
-		final Button closeButton = new Button("Close");
-		// We can set the id of a widget by accessing its Element
-		closeButton.getElement().setId("closeButton");
-		final Label textToServerLabel = new Label();
-		final HTML serverResponseLabel = new HTML();
-		VerticalPanel dialogVPanel = new VerticalPanel();
-		dialogVPanel.addStyleName("dialogVPanel");
-		dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-		dialogVPanel.add(textToServerLabel);
-		dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-		dialogVPanel.add(serverResponseLabel);
-		dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-		dialogVPanel.add(closeButton);
-		dialogBox.setWidget(dialogVPanel);
+		address.textBox.setFocus(true);
 
 		// grid
-		final CellTable<User> table = new CellTable<User>();
-		table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
+		final CellTable<Link> table = new CellTable<Link>();
 		initColumns(table);
 
-		final SingleSelectionModel<User> selectionModel = new SingleSelectionModel<User>();
+		final SingleSelectionModel<Link> selectionModel = new SingleSelectionModel<Link>();
 		table.setSelectionModel(selectionModel);
 		refreshGrid(table);
-		RootPanel.get("grid").add(table);
-
-		Button refreshGrid = new Button("Refresh grid");
-		hPanel.add(refreshGrid);
-		refreshGrid.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				refreshGrid(table);
-			}
-		});
-		
-		RootPanel.get("buttons").add(hPanel);
-
-		// Add a handler to close the DialogBox
-		closeButton.addClickHandler(new ClickHandler() {
-
-			public void onClick(ClickEvent event) {
-				dialogBox.hide();
-				sendButton.setEnabled(true);
-			}
-		});
+		RootPanel.get().add(table);
 
 		// Create a handler for the sendButton and nameField
 		class MyHandler implements ClickHandler, KeyUpHandler {
@@ -144,145 +129,111 @@ public class Start implements EntryPoint {
 			private void sendNameToServer() {
 				// First, we validate the input.
 				errorLabel.setText("");
-				String textToServer = nameField.getText();
-				if (!FieldVerifier.isValidName(textToServer)) {
-					errorLabel.setText("Please enter at least four characters");
-					return;
+
+				Link l = new Link(address.textBox.getText(), name.textBox.getText(), description.getText());
+				Set<ConstraintViolation<Link>> violations = validator.validate(l);
+				if(!violations.isEmpty()) {
+					String error = "";
+					for(ConstraintViolation<Link> c: violations) {
+						error += c.getPropertyPath() + ":" + c.getMessage()+", ";
+					}
+					errorLabel.setText(error);
+				} else {
+					sendButton.setEnabled(false);
+					greetingService.addLink(l, new AsyncCallback<Void>() {
+	
+						public void onFailure(Throwable caught) {
+							sendButton.setEnabled(true);
+							errorLabel.setText(caught.getMessage());
+							caught.printStackTrace();
+						}
+	
+						public void onSuccess(Void result) {
+							sendButton.setEnabled(true);
+							address.textBox.setFocus(true);
+							address.textBox.selectAll();
+							description.setText("");
+							name.textBox.setText("");
+							refreshGrid(table);
+						}
+					});
 				}
 
-				// Then, we send the input to the server.
-				sendButton.setEnabled(false);
-				textToServerLabel.setText(textToServer);
-				serverResponseLabel.setText("");
-				greetingService.addUser(textToServer, new AsyncCallback<String>() {
-
-					public void onFailure(Throwable caught) {
-						// Show the RPC error message to the user
-						dialogBox.setText("Remote Procedure Call - Failure");
-						serverResponseLabel.addStyleName("serverResponseLabelError");
-						serverResponseLabel.setHTML(caught.getMessage());
-						dialogBox.center();
-						closeButton.setFocus(true);
-					}
-
-					public void onSuccess(String result) {
-						dialogBox.setText("Remote Procedure Call");
-						serverResponseLabel.removeStyleName("serverResponseLabelError");
-						serverResponseLabel.setHTML(result);
-						dialogBox.center();
-						closeButton.setFocus(true);
-						refreshGrid(table);
-					}
-				});
 			}
 		}
 
 		// Add a handler to send the name to the server
 		MyHandler handler = new MyHandler();
 		sendButton.addClickHandler(handler);
-		nameField.addKeyUpHandler(handler);
-
-		deleteButton.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				greetingService.deleteAllUsers(new AsyncCallback<Void>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						caught.printStackTrace();
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						refreshGrid(table);
-					}
-				});
-			}
-		});
+		address.textBox.addKeyUpHandler(handler);
+		description.addKeyUpHandler(handler);
+		name.textBox.addKeyUpHandler(handler);
 	}
 
 	private void initColumns(CellTable table) {
-		
-		Column<User, String> loginColumn = new Column<User, String>(new TextCell()) {
+
+		final SafeHtmlCell progressCell = new SafeHtmlCell();
+		Column<Link, SafeHtml> cAddress2 = new Column<Link, SafeHtml>(progressCell){
 
 			@Override
-			public String getValue(User user) {
-				return user.getLogin();
+			public SafeHtml getValue(Link l) {
+				SafeHtmlBuilder sb = new SafeHtmlBuilder();
+				String href = l.getAddress().startsWith("http://") || l.getAddress().startsWith("https://") ? l.getAddress() : "http://" + l.getAddress();
+				sb.appendHtmlConstant("<a href=\""+href+"\" target=\"_blank\">"+l.getName()+"</a>");
+				return sb.toSafeHtml();
 			}
 		};
-		TextColumn<User> cId = new TextColumn<User>() {
-
+		TextColumn<Link> cId = new TextColumn<Link>() {
 			@Override
-			public String getValue(User object) {
+			public String getValue(Link object) {
 				return object.getId() + "";
 			}
 		};
 
-		TextColumn<User> cEmail = new TextColumn<User>() {
-
+		TextColumn<Link> cAddress = new TextColumn<Link>() {
 			@Override
-			public String getValue(User object) {
-				return object.getEmail();
+			public String getValue(Link object) {
+				return object.getAddress() + "";
 			}
 		};
-
-		TextColumn<User> cFirstname = new TextColumn<User>() {
-
+		
+		TextColumn<Link> cName = new TextColumn<Link>() {
 			@Override
-			public String getValue(User object) {
-				return object.getFirstname();
+			public String getValue(Link object) {
+				return object.getName() + "";
 			}
 		};
-
-		TextColumn<User> cLastname = new TextColumn<User>() {
-
+		TextColumn<Link> cDescription = new TextColumn<Link>() {
 			@Override
-			public String getValue(User object) {
-				return object.getLastname();
+			public String getValue(Link object) {
+				return object.getDescription() + "";
 			}
 		};
-
-		TextColumn<User> cTelephone = new TextColumn<User>() {
-
+		TextColumn<Link> cDate = new TextColumn<Link>() {
 			@Override
-			public String getValue(User object) {
-				return object.getTelephone();
-			}
-		};
-
-		TextColumn<User> cDate = new TextColumn<User>() {
-
-			@Override
-			public String getValue(User object) {
+			public String getValue(Link object) {
 				return object.getDate() + "";
 			}
 		};
-
+		
 		table.addColumn(cId,"id");
-		table.addColumn(loginColumn,"login");
-		table.addColumn(cFirstname,"firstname");
-		table.addColumn(cLastname,"lastname");
-		table.addColumn(cEmail,"email");
-		// table.addColumn(cTelephone,"telephone");
+		table.addColumn(cName,"name");
+		table.addColumn(cAddress2,"address");
 		table.addColumn(cDate,"date");
+		table.addColumn(cDescription,"description");
 
 	}
 
 	private void refreshGrid(final CellTable table) {
-		greetingService.allUsers(new AsyncCallback<List>() {
-
+		greetingService.allLinks(new Criteria(), new AsyncCallback<List>() {
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				caught.printStackTrace();
 			}
-
+			
 			@Override
 			public void onSuccess(List result) {
-				GWT.log("SIZE: " + result.size());
-				for (Object u : result) {
-					GWT.log((User) u + "");
-				}
 				table.setRowData(result);
 			}
 		});

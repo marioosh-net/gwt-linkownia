@@ -2,10 +2,14 @@ package net.marioosh.gwt.server;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import net.marioosh.gwt.client.GreetingService;
 import net.marioosh.gwt.shared.RPCException;
+import net.marioosh.gwt.shared.model.dao.LinkDAO;
 import net.marioosh.gwt.shared.model.dao.UserDAO;
+import net.marioosh.gwt.shared.model.entities.Link;
 import net.marioosh.gwt.shared.model.entities.User;
+import net.marioosh.gwt.shared.model.helper.Criteria;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,9 @@ public class GreetingServiceImpl extends AutoinjectingRemoteServiceServlet imple
 
 	@Autowired
 	private UserDAO userDAO;
+	
+	@Autowired
+	private LinkDAO linkDAO;
 
 	@Override
 	public String greetServer(String input) throws IllegalArgumentException {
@@ -78,5 +85,29 @@ public class GreetingServiceImpl extends AutoinjectingRemoteServiceServlet imple
 	
 	public User randomUser() {
 		return userDAO.getRandomUser();
+	}
+	
+	@Override
+	public List<Link> allLinks(Criteria c) {
+		return linkDAO.find(c); 
+	}
+	
+	@Override
+	public void addLink(Link link) throws RPCException {
+		try {
+			Map<String,String> m = WebUtils.pageInfo(link.getAddress());
+			if(m.get("title") != null && (link.getName() == null || link.getName().equals(""))) {
+				link.setName(m.get("title"));
+			}
+			if(m.get("description") != null && (link.getDescription() == null || link.getDescription().equals(""))) {
+				link.setDescription(m.get("description"));
+			}
+			if(link.getName() == null) {
+				link.setName(link.getAddress());
+			}
+			linkDAO.add(link);
+		} catch(Exception e) {
+			throw new RPCException(e.getMessage());
+		}
 	}
 }
