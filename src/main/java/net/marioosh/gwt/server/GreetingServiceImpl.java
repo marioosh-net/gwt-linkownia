@@ -96,15 +96,16 @@ public class GreetingServiceImpl extends AutoinjectingRemoteServiceServlet imple
 	public void addLink(Link link) throws RPCException {
 		try {
 			Map<String,String> m = WebUtils.pageInfo(link.getAddress());
-			if(m.get("title") != null && (link.getName() == null || link.getName().equals(""))) {
+			if(m.get("title") != null && !m.get("title").equals("") && (link.getName() == null || link.getName().equals(""))) {
 				link.setName(m.get("title"));
 			}
-			if(m.get("description") != null && (link.getDescription() == null || link.getDescription().equals(""))) {
+			if(m.get("description") != null && m.get("description").equals("") && (link.getDescription() == null || link.getDescription().equals(""))) {
 				link.setDescription(m.get("description"));
 			}
-			if(link.getName() == null) {
+			if(link.getName() == null || link.getName().equals("")) {
 				link.setName(link.getAddress());
 			}
+			log.info(link);
 			linkDAO.add(link);
 		} catch(Exception e) {
 			throw new RPCException(e.getMessage());

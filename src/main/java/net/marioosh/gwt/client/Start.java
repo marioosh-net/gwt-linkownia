@@ -141,16 +141,25 @@ public class Start implements EntryPoint {
 					errorLabel.setText(error);
 				} else {
 					sendButton.setEnabled(false);
+					address.textBox.setEnabled(false);
+					name.textBox.setEnabled(false);
+					description.setEnabled(false);
 					greetingService.addLink(l, new AsyncCallback<Void>() {
 	
 						public void onFailure(Throwable caught) {
 							sendButton.setEnabled(true);
+							address.textBox.setEnabled(true);
+							name.textBox.setEnabled(true);
+							description.setEnabled(true);							
 							errorLabel.setText(caught.getMessage());
 							caught.printStackTrace();
 						}
 	
 						public void onSuccess(Void result) {
 							sendButton.setEnabled(true);
+							address.textBox.setEnabled(true);
+							name.textBox.setEnabled(true);
+							description.setEnabled(true);							
 							address.textBox.setFocus(true);
 							address.textBox.selectAll();
 							description.setText("");
