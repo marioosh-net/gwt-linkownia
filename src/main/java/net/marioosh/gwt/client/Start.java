@@ -2,16 +2,17 @@ package net.marioosh.gwt.client;
 
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+
 import net.marioosh.gwt.shared.model.entities.Link;
 import net.marioosh.gwt.shared.model.helper.Criteria;
 
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,7 +29,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -41,12 +41,6 @@ import com.google.gwt.view.client.SingleSelectionModel;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Start implements EntryPoint {
-
-	/**
-	 * The message displayed to the user when the server cannot be reached or
-	 * returns an error.
-	 */
-	private static final String SERVER_ERROR = "An error occurred while " + "attempting to contact the server. Please check your network " + "connection and try again.";
 
 	/**
 	 * Create a remote service proxy to talk to the server-side Greeting
@@ -183,7 +177,7 @@ public class Start implements EntryPoint {
 		name.textBox.addKeyUpHandler(handler);
 	}
 
-	private void initColumns(final CellTable table) {
+	private void initColumns(final CellTable<Link> table) {
 
 		final SafeHtmlCell progressCell = new SafeHtmlCell();
 		Column<Link, SafeHtml> cAddress2 = new Column<Link, SafeHtml>(progressCell){
@@ -203,13 +197,6 @@ public class Start implements EntryPoint {
 			}
 		};
 
-		TextColumn<Link> cAddress = new TextColumn<Link>() {
-			@Override
-			public String getValue(Link object) {
-				return object.getAddress() + "";
-			}
-		};
-		
 		TextColumn<Link> cName = new TextColumn<Link>() {
 			@Override
 			public String getValue(Link object) {
@@ -260,7 +247,7 @@ public class Start implements EntryPoint {
 
 	}
 
-	private void refreshGrid(final CellTable table) {
+	private void refreshGrid(final CellTable<Link> table) {
 		greetingService.allLinks(new Criteria(), new AsyncCallback<List>() {
 			
 			@Override
