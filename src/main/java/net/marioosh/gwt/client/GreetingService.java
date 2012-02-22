@@ -24,4 +24,5 @@ public interface GreetingService extends RemoteService {
 
   public void addLink(Link link) throws RPCException;
   public List<Link> allLinks(Criteria c);
+  public void deleteLink(Long id);
 }

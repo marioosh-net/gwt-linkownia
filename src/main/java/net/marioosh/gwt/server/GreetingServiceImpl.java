@@ -111,4 +111,9 @@ public class GreetingServiceImpl extends AutoinjectingRemoteServiceServlet imple
 			throw new RPCException(e.getMessage());
 		}
 	}
+	
+	@Override
+	public void deleteLink(Long id) {
+		linkDAO.delete(id);
+	}
 }

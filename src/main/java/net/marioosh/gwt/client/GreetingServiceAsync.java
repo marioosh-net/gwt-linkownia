@@ -78,6 +78,13 @@ public interface GreetingServiceAsync
 
 
     /**
+     * GWT-RPC service  asynchronous (client-side) interface
+     * @see net.marioosh.gwt.client.GreetingService
+     */
+    void deleteLink( java.lang.Long p0, AsyncCallback<Void> callback );
+
+
+    /**
      * Utility class to get the RPC Async interface from client-side code
      */
     public static final class Util 

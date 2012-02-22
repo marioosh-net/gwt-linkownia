@@ -7,6 +7,9 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import net.marioosh.gwt.shared.model.entities.Link;
 import net.marioosh.gwt.shared.model.helper.Criteria;
+
+import com.google.gwt.cell.client.ButtonCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.EntryPoint;
@@ -180,7 +183,7 @@ public class Start implements EntryPoint {
 		name.textBox.addKeyUpHandler(handler);
 	}
 
-	private void initColumns(CellTable table) {
+	private void initColumns(final CellTable table) {
 
 		final SafeHtmlCell progressCell = new SafeHtmlCell();
 		Column<Link, SafeHtml> cAddress2 = new Column<Link, SafeHtml>(progressCell){
@@ -225,7 +228,30 @@ public class Start implements EntryPoint {
 				return object.getDate() + "";
 			}
 		};
+
+		// delete button
+		ButtonCell deleteButton = new ButtonCell();
+		Column<Link,String> delete = new Column<Link,String>(deleteButton) {
+		  public String getValue(Link link) {
+		    return "Delete";
+		  }
+		};
+		delete.setFieldUpdater(new FieldUpdater<Link, String>() {
+			@Override
+			public void update(int index, Link link, String value) {
+				greetingService.deleteLink(link.getId(), new AsyncCallback<Void>(){
+					@Override
+					public void onFailure(Throwable arg0) {
+					}
+					@Override
+					public void onSuccess(Void arg0) {
+						refreshGrid(table);
+					}
+				});
+			}
+		});
 		
+		table.addColumn(delete);
 		table.addColumn(cId,"id");
 		table.addColumn(cName,"name");
 		table.addColumn(cAddress2,"address");
